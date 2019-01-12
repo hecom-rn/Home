@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@hecom/home.svg?style=flat)](https://www.npmjs.com/package/@hecom/home)
 
-这是功能。
+这是主页配置管理模块，主要用于注册主页配置信息，以及处理方式。
 
 **接口**：
 
