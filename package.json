@@ -1,0 +1,19 @@
+{
+  "name": "@hecom/home",
+  "version": "0.0.1",
+  "description": "Home Module Management",
+  "main": "dist/index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:hecom/home.git"
+  },
+  "author": "Xiaosong Gao",
+  "license": "MIT",
+  "peerDependencies": {
+    "@hecom/authority": "*",
+    "@hecom/foundation": "*",
+    "@hecom/meta": "*",
+    "specials": "*"
+  }
+}
