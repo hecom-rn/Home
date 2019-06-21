@@ -25,6 +25,7 @@ export default {
     name: ModuleName,
     initGlobal: _initGlobal,
     get: _get,
+    update: _update,
     setDefault: _setDefault,
     registerUi: {
         page: _registerUi(PageType),
@@ -57,6 +58,11 @@ export default {
 
 function _initGlobal() {
     // TODO 添加人员自定义主页时用到
+}
+
+function _update(func) {
+    const newConfig = func(rootNode.defaultConfig);
+    _setDefault(newConfig);
 }
 
 function _get() {
