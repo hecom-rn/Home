@@ -1,6 +1,7 @@
 # Home
 
 [![npm version](https://img.shields.io/npm/v/@hecom/home.svg?style=flat)](https://www.npmjs.com/package/@hecom/home)
+[![Build Status](https://travis-ci.org/hecom-rn/Home.svg?branch=master)](https://travis-ci.org/hecom-rn/Home)
 
 这是主页配置管理模块，主要用于注册主页配置信息，以及处理方式。
 

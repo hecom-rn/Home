@@ -1,12 +1,21 @@
 {
   "name": "@hecom/home",
   "version": "1.0.1",
+  "private": false,
   "description": "Home Module Management",
   "main": "src/index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "lint": "./node_modules/.bin/eslint . --ext .ts,.tsx;",
+    "minor": "npm version minor -m 'Bump version %s';git push origin master --tags",
+    "patch": "npm version patch -m 'Bump version %s';git push origin master --tags"
+  },
   "repository": {
     "type": "git",
     "url": "git@gitlab.com:hecom/home.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "author": "Xiaosong Gao",
   "license": "MIT",
