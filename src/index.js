@@ -1,4 +1,3 @@
-import { Alert } from 'react-native';
 import * as Specials from 'specials';
 import Foundation from '@hecom/foundation';
 import Meta from '@hecom/meta';
@@ -11,6 +10,7 @@ const types = {
 
 const rootNode = {
     defaultConfig: undefined,
+    onActionNoAuth: undefined,
 };
 
 const ModuleName = '@hecom/home';
@@ -56,8 +56,9 @@ export default {
     },
 };
 
-function _initGlobal() {
+function _initGlobal({onActionNoAuth} = {}) {
     // TODO 添加人员自定义主页时用到
+    rootNode.onActionNoAuth = onActionNoAuth
 }
 
 function _update(func) {
@@ -100,8 +101,7 @@ function _match(keys, params) {
         if (keyType === types.ui) {
             return null;
         } else if (keyType === types.action) {
-            Alert.alert('', '你没有权限操作');
-            return;
+            return rootNode.onActionNoAuth && rootNode.onActionNoAuth(params);
         }
     }
     return Specials.get(rootNode, keys, params, params);
