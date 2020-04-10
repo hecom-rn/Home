@@ -23,7 +23,7 @@
     "@hecom/authority": "*",
     "@hecom/foundation": "*",
     "@hecom/meta": "*",
-    "specials": "*"
+    "specials": "^2.0.0"
   },
   "devDependencies": {
     "eslint-plugin-automatic": "latest",

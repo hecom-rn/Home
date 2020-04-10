@@ -8,6 +8,8 @@ const types = {
     action: 'action',
 };
 
+const instance = Specials.getInstance();
+
 const rootNode = {
     defaultConfig: undefined,
     onActionNoAuth: undefined,
@@ -81,7 +83,7 @@ function _registerUi(showtype) {
 }
 
 function _general(types, finalFunc) {
-    return Specials.register(rootNode, types, undefined, finalFunc);
+    return instance.registerDefault(types, finalFunc);
 }
 
 function _match(keys, params) {
@@ -104,7 +106,7 @@ function _match(keys, params) {
             return rootNode.onActionNoAuth && rootNode.onActionNoAuth(params);
         }
     }
-    return Specials.get(rootNode, keys, params, params);
+    return instance.get(keys, params, params);
 }
 
 function _createMetaCell(metaName, label, icon, color, other) {
