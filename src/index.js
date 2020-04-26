@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import * as Specials from 'specials';
 import Foundation from '@hecom/foundation';
 import Meta from '@hecom/meta';
@@ -8,11 +9,8 @@ const types = {
     action: 'action',
 };
 
-const instance = Specials.getInstance();
-
 const rootNode = {
     defaultConfig: undefined,
-    onActionNoAuth: undefined,
 };
 
 const ModuleName = '@hecom/home';
@@ -36,6 +34,13 @@ export default {
         naviButton: _registerUi(NaviButtonType),
         function: _registerUi(FunctionType),
     },
+    unregisterUi: {
+        page: _unregisterUi(PageType),
+        section: _unregisterUi(SectionType),
+        cell: _unregisterUi(CellType),
+        naviButton: _unregisterUi(NaviButtonType),
+        function: _unregisterUi(FunctionType),
+    },
     registerAction: (name, func) => _general([types.action, name], func),
     create: {
         metaCell: _createMetaCell,
@@ -58,9 +63,8 @@ export default {
     },
 };
 
-function _initGlobal({onActionNoAuth} = {}) {
+function _initGlobal() {
     // TODO 添加人员自定义主页时用到
-    rootNode.onActionNoAuth = onActionNoAuth
 }
 
 function _update(func) {
@@ -76,6 +80,12 @@ function _setDefault(config) {
     rootNode.defaultConfig = config;
 }
 
+function _unregisterUi(showtype)  {
+    return function (name, funcId) {
+        return Specials.unregister([types.ui, showtype, name], funcId);
+    };
+}
+
 function _registerUi(showtype) {
     return function (name, func) {
         return _general([types.ui, showtype, name], func);
@@ -83,7 +93,7 @@ function _registerUi(showtype) {
 }
 
 function _general(types, finalFunc) {
-    return instance.registerDefault(types, finalFunc);
+    return Specials.register(rootNode, types, undefined, finalFunc);
 }
 
 function _match(keys, params) {
@@ -103,10 +113,11 @@ function _match(keys, params) {
         if (keyType === types.ui) {
             return null;
         } else if (keyType === types.action) {
-            return rootNode.onActionNoAuth && rootNode.onActionNoAuth(params);
+            Alert.alert('', '你没有权限操作');
+            return;
         }
     }
-    return instance.get(keys, params, params);
+    return Specials.get(rootNode, keys, params, params);
 }
 
 function _createMetaCell(metaName, label, icon, color, other) {
