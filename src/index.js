@@ -36,6 +36,13 @@ export default {
         naviButton: _registerUi(NaviButtonType),
         function: _registerUi(FunctionType),
     },
+    unregisterUi: {
+        page: _unregisterUi(PageType),
+        section: _unregisterUi(SectionType),
+        cell: _unregisterUi(CellType),
+        naviButton: _unregisterUi(NaviButtonType),
+        function: _unregisterUi(FunctionType),
+    },
     registerAction: (name, func) => _general([types.action, name], func),
     create: {
         metaCell: _createMetaCell,
@@ -74,6 +81,12 @@ function _get() {
 
 function _setDefault(config) {
     rootNode.defaultConfig = config;
+}
+
+function _unregisterUi(showtype)  {
+    return function (name, funcId) {
+        return instance.unregister([types.ui, showtype, name], funcId);
+    };
 }
 
 function _registerUi(showtype) {
