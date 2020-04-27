@@ -22,7 +22,7 @@
   "peerDependencies": {
     "@hecom/authority": "*",
     "@hecom/foundation": "*",
-    "@hecom/meta": "*",
+    "@hecom/meta": "*"
   },
   "dependencies": {
       "specials": "^2.0.0"
