@@ -1,6 +1,6 @@
 {
   "name": "@hecom/home",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": false,
   "description": "Home Module Management",
   "main": "src/index.js",
@@ -25,7 +25,7 @@
     "@hecom/meta": "*"
   },
   "dependencies": {
-      "specials": "^2.0.0"
+    "specials": "^2.0.0"
   },
   "devDependencies": {
     "eslint-plugin-automatic": "latest",
