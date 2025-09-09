@@ -3,7 +3,7 @@
   "version": "1.2.1",
   "private": false,
   "description": "Home Module Management",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest --passWithNoTests",
     "lint": "./node_modules/.bin/eslint . --ext .ts,.tsx;",
@@ -17,19 +17,19 @@
   "publishConfig": {
     "access": "public"
   },
-  "author": "Xiaosong Gao",
+  "author": "baiyudong",
   "license": "MIT",
   "peerDependencies": {
     "@hecom/authority": "*",
-    "@hecom/foundation": "*",
-    "@hecom/meta": "*"
-  },
-  "dependencies": {
-    "specials": "^2.0.0"
+    "@hecom/util": "*",
+    "specials": "^2.0.4"
   },
   "devDependencies": {
-    "eslint-plugin-automatic": "latest",
+    "@hecom/authority": "^1.6.4",
+    "@hecom/util": "^1.0.5",
     "@types/jest": "^24.0.15",
-    "jest": "^24.8.0"
+    "eslint-plugin-automatic": "latest",
+    "jest": "^24.8.0",
+    "specials": "^2.0.4"
   }
 }
