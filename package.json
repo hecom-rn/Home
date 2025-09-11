@@ -7,6 +7,7 @@
   "scripts": {
     "test": "jest --passWithNoTests",
     "lint": "./node_modules/.bin/eslint . --ext .ts,.tsx;",
+    "major": "npm version major -m 'Bump version %s';git push origin master --tags",
     "minor": "npm version minor -m 'Bump version %s';git push origin master --tags",
     "patch": "npm version patch -m 'Bump version %s';git push origin master --tags"
   },
