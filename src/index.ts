@@ -1,10 +1,12 @@
 import Authority from '@hecom/authority';
 import Util from '@hecom/util';
+import { ReactNode } from 'react';
 import * as Specials from 'specials';
 
 enum types {
   ui = 'ui',
   action = 'action',
+  filter = 'filter',
 }
 
 enum UiTypes {
@@ -43,7 +45,7 @@ interface BaseConfig {
   name: string;
 }
 
-interface ItemConfig extends BaseConfig {
+export interface ItemConfig extends BaseConfig {
   type: UiTypes.cell | UiTypes.naviButton;
   label?: string;
   icon?: string;
@@ -51,50 +53,47 @@ interface ItemConfig extends BaseConfig {
   [key: string]: any;
 }
 
-interface SectionConfig extends BaseConfig {
+export interface SectionConfig extends BaseConfig {
   type: UiTypes.section | UiTypes.function;
-  cells: ItemConfig[];
+  cells?: ItemConfig[];
 }
 
-interface PageConfig extends BaseConfig {
+export interface PageConfig extends BaseConfig {
   type: UiTypes.page | UiTypes.function;
   label: string;
   icon: any;
-  select_icon: any;
-  sections: SectionConfig[];
+  selected_icon: any;
+  sections?: SectionConfig[];
   [key: string]: any;
 }
 
-type Config<T = any> = T & {
+export type Config = {
   init_name?: string;
   tabs?: PageConfig[];
 };
 
-type State = ItemConfig | SectionConfig | PageConfig;
+export type State = ItemConfig | SectionConfig | PageConfig;
 
-type HandleFunc = (config?: State) => any;
-
-type StateFunc = (config?: State) => boolean;
+type HandleFunc<C = State> = (config?: C) => ReactNode | null | void | boolean;
 
 const instance = Specials.getInstance<State, State, HandleFunc>();
 
 const rootNode: { defaultConfig: Config } = {
-  defaultConfig: undefined,
+  defaultConfig: {},
 };
 
 const ModuleName = '@hecom/home';
 
 export default {
   name: ModuleName,
-  initGlobal: _initGlobal,
   get: _get,
   update: _update,
   setDefault: _setDefault,
   registerUi: {
-    page: _registerUi(UiTypes.page),
-    section: _registerUi(UiTypes.section),
-    cell: _registerUi(UiTypes.cell),
-    naviButton: _registerUi(UiTypes.naviButton),
+    page: _registerUi<PageConfig>(UiTypes.page),
+    section: _registerUi<SectionConfig>(UiTypes.section),
+    cell: _registerUi<ItemConfig>(UiTypes.cell),
+    naviButton: _registerUi<ItemConfig>(UiTypes.naviButton),
     function: _registerUi(UiTypes.function),
   },
   unregisterUi: {
@@ -104,7 +103,7 @@ export default {
     naviButton: _unregisterUi(UiTypes.naviButton),
     function: _unregisterUi(UiTypes.function),
   },
-  registerAction: (name, func) => _general([types.action, name], func),
+  registerAction: (name: string, func: HandleFunc) => _general([types.action, name], func),
   create: {
     metaCell: _createMetaCell,
     functionCell: _createFunctionCell,
@@ -115,18 +114,16 @@ export default {
     functionPage: _createFunctionPage,
     tabHome: _createTabHome,
   },
-  matchUi: (params) => _match([types.ui, params.type, params.name], params),
-  matchAction: (name, params) => _match([types.action, name], params),
+  matchUi: (params: State) => _match([types.ui, params.type, params.name], params),
+  matchAction: (name: string, params: State) => _match([types.action, name], params, false),
   type: {
-    isPage: (config) => config.type === UiTypes.page,
-    isSection: (config) => config.type === UiTypes.section,
-    isCell: (config) => config.type === UiTypes.cell,
-    isNaviButton: (config) => config.type === UiTypes.naviButton,
-    isFunction: (config) => config.type === UiTypes.function,
+    isPage: (config: BaseConfig) => config.type === UiTypes.page,
+    isSection: (config: BaseConfig) => config.type === UiTypes.section,
+    isCell: (config: BaseConfig) => config.type === UiTypes.cell,
+    isNaviButton: (config: BaseConfig) => config.type === UiTypes.naviButton,
+    isFunction: (config: BaseConfig) => config.type === UiTypes.function,
   },
 };
-
-function _initGlobal() {}
 
 function _update(func: (config: Config) => Config): void {
   const newConfig = func(rootNode.defaultConfig);
@@ -134,7 +131,7 @@ function _update(func: (config: Config) => Config): void {
 }
 
 function _get(): Config {
-  return Util.Obj.deepJsonCopy(rootNode.defaultConfig);
+  return Util.Obj.deepJsonCopy(rootNode.defaultConfig) as Config;
 }
 
 function _setDefault(config: Config): void {
@@ -147,23 +144,25 @@ function _unregisterUi(showtype: UiTypes) {
   };
 }
 
-function _registerUi(showtype: UiTypes) {
-  return function (name: string, func: HandleFunc, filter?: StateFunc): Specials.HandleId | void {
-    return _general([types.ui, showtype, name], func, filter);
+function _registerUi<C = State>(showtype: UiTypes) {
+  return function (name: string, func: HandleFunc<C>, filter?: HandleFunc<C>): void {
+    if (filter) {
+      _general([types.filter, showtype, name], filter);
+    }
+    if (func) {
+      _general([types.ui, showtype, name], func);
+    }
   };
 }
 
-function _general(types, finalFunc: HandleFunc, filter?: StateFunc): Specials.HandleId | void {
-  if (filter) {
-    return instance.registerSpecial(types, filter, finalFunc);
-  }
-  return instance.registerDefault(types, finalFunc);
+function _general<C>(types, func: HandleFunc<C>): Specials.HandleId | void {
+  return instance.registerDefault(types, func);
 }
 
-function _match(keys: string[], params: State) {
-  const keyType = keys[0];
+function _match(keys: string[], params: State, needFilter = true): ReactNode | null {
+  const [keyType, ...otherKey] = keys;
   const { auth = [] } = params;
-  const result = auth.reduce((prv, cur) => {
+  const hasAuth = auth.reduce((prv, cur) => {
     const { app, metaName, innerApp = 'std', action } = cur;
     let result;
     if (metaName) {
@@ -173,44 +172,63 @@ function _match(keys: string[], params: State) {
     }
     return prv && result;
   }, true);
-  if (!result) {
+  if (!hasAuth) {
     if (keyType === types.ui) {
       return null;
     } else if (keyType === types.action) {
       return null;
     }
   }
+  if (needFilter) {
+    const filterHandle = instance.get([types.filter, ...otherKey], params);
+    if (filterHandle && !filterHandle(params)) {
+      return null;
+    }
+  }
   return instance.get(keys, params, params);
 }
 
-function _createMetaCell(metaName, label, icon, color, other): ItemConfig {
+function _createMetaCell<T = {}>(metaName: string, label: string, icon: string, color: string, other?: T): ItemConfig {
   return { type: UiTypes.cell, name: 'meta', metaName, label, icon, color, ...other };
 }
 
-function _createFunctionCell(name, label, icon, color, other): ItemConfig {
+function _createFunctionCell<T = {}>(name: string, label: string, icon: string, color: string, other?: T): ItemConfig {
   return { type: UiTypes.cell, name, label, icon, color, ...other };
 }
 
-function _createNaviButton(name, icon, color, other): ItemConfig {
+function _createNaviButton<T = {}>(name: string, icon: string, color: string, other?: T): ItemConfig {
   return { type: UiTypes.naviButton, name, icon, color, ...other };
 }
 
-function _createRowSection(cells, other): ItemConfig {
+function _createRowSection<T = {}>(cells: ItemConfig[], other?: T): SectionConfig {
   return { type: UiTypes.section, name: '', cells, ...other };
 }
 
-function _createFunctionSection(name, other): ItemConfig {
+function _createFunctionSection<T = {}>(name: string, other?: T): SectionConfig {
   return { type: UiTypes.function, name, ...other };
 }
 
-function _createSectionPage(name, label, icon, selected_icon, sections, other): ItemConfig {
+function _createSectionPage<T = {}>(
+  name: string,
+  label: string,
+  icon: string,
+  selected_icon: string,
+  sections: SectionConfig[],
+  other?: T
+): PageConfig {
   return { type: UiTypes.page, name, label, icon, selected_icon, sections, ...other };
 }
 
-function _createFunctionPage(name, label, icon, selected_icon, other): ItemConfig {
+function _createFunctionPage<T = {}>(
+  name: string,
+  label: string,
+  icon: string,
+  selected_icon: string,
+  other?: T
+): PageConfig {
   return { type: UiTypes.function, name, label, icon, selected_icon, ...other };
 }
 
-function _createTabHome(init_name, tabs, other): Config {
+function _createTabHome<T = {}>(init_name: string, tabs: PageConfig[], other?: T): Config {
   return { init_name, tabs, ...other };
 }
