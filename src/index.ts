@@ -156,10 +156,10 @@ function _registerUi<C = State>(showtype: UiTypes) {
 }
 
 function _general<C>(types, func: HandleFunc<C>): Specials.HandleId | void {
-  return instance.registerDefault(types, func);
+  return instance.registerDefault(types, func as HandleFunc<State>);
 }
 
-function _match(keys: string[], params: State, needFilter = true): ReactNode | null {
+function _match(keys: string[], params: State, needFilter = true): ReactNode | null | void {
   const [keyType, ...otherKey] = keys;
   const { auth = [] } = params;
   const hasAuth = auth.reduce((prv, cur) => {
