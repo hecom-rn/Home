@@ -163,7 +163,7 @@ function _match(keys: string[], params: State, needFilter = true): ReactNode | n
   const [keyType, ...otherKey] = keys;
   const { auth = [] } = params;
   const hasAuth = auth.reduce((prv, cur) => {
-    const { app, metaName, innerApp = 'std', action } = cur;
+    const { app, metaName, innerApp, action } = cur;
     let result;
     if (metaName) {
       result = Authority.obj.verify(metaName, innerApp, action);
